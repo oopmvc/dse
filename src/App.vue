@@ -10,11 +10,13 @@
                       <ul class="nav">
                         <li v-for="link in links" @click="OpenURL(link.url)"> {{ link.text }}   </li>
                       </ul>
+
+                      <input type="text" v-model="selectedCompany"  />
                     <div class="left-nav">
                           <ul class="nav">
                             <li v-for="company in dsecompanies" :class="{active:selectedCompany == company.script}">  
 
-                              <h5  @click="ShowChart(company.script)" > {{ company.script }}  </h5>
+                              <h5  @click="ShowOtherInfo(company.script)" > {{ company.script }}  </h5>
                               <small  @click="ShowChart(company.script)" >{{ company.title }} </small>
 
                               <span> 
@@ -23,6 +25,8 @@
                                 <i class="fa fa-newspaper-o "  @click="showCompanyStatistic(company.script, company.stockId)"  ></i> 
 
                                 <i class="fa fa-picture-o"  @click="ShowSBCompanyDetails(company.script)"  ></i> 
+                                <i class="fa fa-area-chart"  @click="ShowSBMinuteChart(company.script)"  ></i> 
+                                <i class="fa fa-info"  @click="ShowOtherInfo(company.script)"  ></i> 
 
 
 
@@ -37,6 +41,7 @@
                 <div class="pure-pusher">
                     <div style="width: 100%; height: 100%; margin: 100px auto;">
                        <iframe v-if="iframeURL" :src="iframeURL"  > </iframe >
+                       <div id="dynamicHTML" v-if="dynamicHTML" v-html="dynamicHTMLContent" > </div>
                     </div>
                 </div>
             </div>
@@ -53,6 +58,9 @@ export default {
     return { 
         iframeURL: 'http://lankabd.com/portal/DSE/smartChartFullScreen.html?symbol=DSEX&siteLanguage=en', 
         selectedCompany: '',
+        dsescrap: [],
+        dynamicHTML: true,
+        dynamicHTMLContent: '',
         links: [
                 {
                   text: "Data Matrix2",
@@ -842,20 +850,59 @@ SBZEALBANGLA : '14266'  }
       }
     },
    mounted(){ 
-        //var _this = this;
-        //console.log(this.stockbangladesh);
+        var _this = this;
+        console.log(this.dsescrap);
 
-        // axios.get('/companies.json')
-        // .then(function (response) { 
-        //     _this.dsecompanies = response.data ;
-        // })
-        // .catch(function (error) {
-        //   console.log(error);
-        // });
+         axios.get('/dsescrap.json')
+         .then(function (response) { 
+             _this.dsescrap = response.data ;
+             console.log(_this.dsescrap);
+         })
+         .catch(function (error) {
+           console.log(error);
+         });
+  },
+  filters:{
+         mycase: function(item){
+            console.log(item);
+            return item;
+         }
   },
   methods:{
      OpenURL: function(url){ 
           this.iframeURL = url; 
+
+     },
+     ShowOtherInfo: function(script){
+           var obj = _.find(this.dsescrap, function(el) {
+              return _.get(el, 'Script') === script;
+           });
+
+           this.selectedCompany = script;
+           this.iframeURL = '';
+
+    
+
+              this.dynamicHTMLContent =  `
+            <table> 
+
+           <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr>
+           <tr> <td> Total Security </td><td> `+  obj.TotalSecurity +  `</td></tr>
+           <tr> <td> AuthorizedCap </td><td> `+  obj.AuthorizedCap +  `</td></tr>
+           <tr> <td> PaidUp </td><td> `+  obj.PaidUp +  `</td></tr>
+           <tr> <td> Sector </td><td> `+  obj.Sector +  `</td></tr>
+           <tr> <td> YearEnd </td><td> `+  obj.YearEnd +  `</td></tr>
+           <tr> <td> Reserve </td><td> `+  obj.Reserve +  `</td></tr></table>
+           <h4>OTHER INFORMATION </h4> 
+            <table><tr><td>`+  obj.OtherInfo +  ` </td></tr></table>
+           <h4>Address</h4>
+           <table><tr><td>`+  obj.Address +  ` </td></tr></table>
+ 
+
+           </table> <br /> <a href='http://dsebd.org/displayCompany.php?name='` + script + `' target='_blank'>`+ script + `</a> 
+
+           `;
+
 
      },
      ShowChart: function(script){
@@ -874,6 +921,10 @@ SBZEALBANGLA : '14266'  }
      showCompanyStatistic: function(script, stockId){
            this.selectedCompany = script;
            this.iframeURL =  'http://lankabd.com/dse/stock-market/'+script+'POWERGRID/power-grid-company-of-bangladesh-limited/Statistics-Dividend-shareholding-pattern?companyId='+stockId+'&stockId='+ stockId;
+     },
+     ShowSBMinuteChart: function(script){
+           this.selectedCompany = script;
+           this.iframeURL =  'http://www.stockbangladesh.com/resources/minutechartnew?TickerSymbol='+ this.stockbangladesh['SB'+script] +'&inv=60&btnMinuteChart=Show+Minute+Chart';
      }
   }
 }
@@ -907,4 +958,7 @@ h5 { margin: 0 ; padding:2px 0;}
   background-color: #aaa;
 }
 
+
+table tr td { border: 1px solid #777; background: #eee;  padding: 3px 2px; }
+table#company{ max-width: 100%;}
 </style>
