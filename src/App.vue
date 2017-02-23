@@ -11,29 +11,50 @@
                         <li v-for="link in links" @click="OpenURL(link.url)"> {{ link.text }}   </li>
                       </ul>
 
-                      <input type="text" v-model="selectedCompany"  />
-                    <div class="left-nav">
+                   
+                   <div id="scriptAction">
+
+                            <input type="hidden" v-model="selectedCompany"  /> <br />
+
+                           <select v-model="selectScript" @change="ScriptChanged()">
+                                        <option v-for="company in dsecompanies" :value="company.stockId + ':' + company.script">{{company.script}}</option> 
+                           </select> 
+
+
+                              <h5  @click="ShowChart(selectedCompany)" > {{ selectedCompany }}  </h5> 
+
+                              <span> 
+                                <i class="fa fa-bar-chart  fa-2x"  @click="ShowChart(selectedCompany)"  ></i> 
+                                <i class="fa fa-line-chart"  @click="ShowCompanyDetails(selectedCompany, selectedCompanyID)"  ></i> 
+                                <i class="fa fa-newspaper-o"  @click="showCompanyStatistic(selectedCompany, selectedCompanyID)"  ></i> 
+
+                                <i class="fa fa-picture-o fa-2x"  @click="ShowSBCompanyDetails(selectedCompany )"  ></i> 
+                                <i class="fa fa-area-chart"  @click="ShowSBMinuteChart(selectedCompany)"  ></i> 
+                                <i class="fa fa-info fa-3x"  @click="ShowOtherInfo(selectedCompany , 1)"  ></i>  
+                                
+                              </span>
+
+                   </div>
+                    <!--div class="left-nav">
                           <ul class="nav">
                             <li v-for="company in dsecompanies" :class="{active:selectedCompany == company.script}">  
 
-                              <h5  @click="ShowOtherInfo(company.script)" > {{ company.script }}  </h5>
+                              <h5  @click="ShowChart(company.script)" > {{ company.script }}  </h5>
                               <small  @click="ShowChart(company.script)" >{{ company.title }} </small>
 
                               <span> 
                                 <i class="fa fa-bar-chart"  @click="ShowChart(company.script)"  ></i> 
                                 <i class="fa fa-line-chart"  @click="ShowCompanyDetails(company.script, company.stockId)"  ></i> 
-                                <i class="fa fa-newspaper-o "  @click="showCompanyStatistic(company.script, company.stockId)"  ></i> 
+                                <i class="fa fa-newspaper-o"  @click="showCompanyStatistic(company.script, company.stockId)"  ></i> 
 
-                                <i class="fa fa-picture-o"  @click="ShowSBCompanyDetails(company.script)"  ></i> 
+                                <i class="fa fa-picture-o "  @click="ShowSBCompanyDetails(company.script)"  ></i> 
                                 <i class="fa fa-area-chart"  @click="ShowSBMinuteChart(company.script)"  ></i> 
-                                <i class="fa fa-info"  @click="ShowOtherInfo(company.script)"  ></i> 
-
-
+                                <i class="fa fa-info"  @click="ShowOtherInfo(company.script, 1)"  ></i>  
 
                               </span>
                             </li>
                           </ul>
-                    </div>
+                    </div-->
               </div>
             </nav>   
             
@@ -58,9 +79,11 @@ export default {
     return { 
         iframeURL: 'http://lankabd.com/portal/DSE/smartChartFullScreen.html?symbol=DSEX&siteLanguage=en', 
         selectedCompany: '',
+        selectedCompanyID: '',
         dsescrap: [],
         dynamicHTML: true,
         dynamicHTMLContent: '',
+        selectScript: '',
         links: [
                 {
                   text: "Data Matrix2",
@@ -856,7 +879,38 @@ SBZEALBANGLA : '14266'  }
          axios.get('/dsescrap.json')
          .then(function (response) { 
              _this.dsescrap = response.data ;
-             console.log(_this.dsescrap);
+
+
+             _.forEach(_this.dsescrap, function(obj){
+
+                        var patt = new RegExp("([T]\\d)");
+                        var res = patt.test(obj.Script); // "T15Y0323"
+
+console.log(obj.Script)
+                       
+                       if(! RegExp("([T]\\d)").test(obj.Script) ){ 
+                                
+
+                               var table  = jQuery(obj.OtherInfo);
+                    //           var row1 = jQuery('table tr', table).eq(0) ;
+                               var row2 = jQuery('table tr', table).eq(1);
+                               var row3 = jQuery('table tr', table).eq(2); 
+
+                               var pubsh2 = jQuery('td font', row2).eq(4).html();
+                               pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
+                                
+                               var pubsh3 = jQuery('td font', row3).eq(4).html();
+                               pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
+
+                               var pub_diff = pubsh3 - pubsh2;
+         
+                               if(pub_diff  < 0 )  console.log(obj.Script)
+                           }
+
+             })
+
+
+
          })
          .catch(function (error) {
            console.log(error);
@@ -868,22 +922,71 @@ SBZEALBANGLA : '14266'  }
             return item;
          }
   },
+  watch:{
+     selectedCompany: function (val) {
+         this.ShowOtherInfo(val, 0);
+     },
+     selectScript: function (val) {
+         var newval = val.split(":");
+         this.selectedCompany = newval[1];
+         this.selectedCompanyID = newval[0];
+     }
+  },
   methods:{
      OpenURL: function(url){ 
           this.iframeURL = url; 
 
      },
-     ShowOtherInfo: function(script){
+     ScriptChanged: function(){
+            this.ShowOtherInfo(this.selectedCompany, 1)
+     },
+     ShowOtherInfo: function(script, infoonly){
            var obj = _.find(this.dsescrap, function(el) {
               return _.get(el, 'Script') === script;
            });
 
-           this.selectedCompany = script;
-           this.iframeURL = '';
+           if(infoonly == 1){
+               this.iframeURL = '';
+           }
 
-    
+           var extrainfo = '';  
+           var color = 'GREEN';
+             
+           var table  = jQuery(obj.OtherInfo);
+//           var row1 = jQuery('table tr', table).eq(0) ;
+           var row2 = jQuery('table tr', table).eq(1);
+           var row3 = jQuery('table tr', table).eq(2) ;
+ 
+           var spdir2 = $('td font', row2).eq(0).html();
+           spdir2 = parseFloat(spdir2.replace("Sponsor/Director:<br>", ""));
+            
+           var spdir3 = $('td font', row3).eq(0).html();
+           spdir3 = parseFloat(spdir3.replace("Sponsor/Director:<br>", ""));
 
-              this.dynamicHTMLContent =  `
+           var spdir_diff = spdir3 - spdir2;
+
+           color = 'GREEN'; 
+           if(spdir_diff  < 0 ) color = 'RED';
+           extrainfo = '<span style="color:' + color + '"><b> SPDIR DIFF </b>: ' + spdir_diff + '</span><br /> ';
+
+
+           var pubsh2 = $('td font', row2).eq(4).html();
+           pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
+            
+           var pubsh3 = $('td font', row3).eq(4).html();
+           pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
+
+           var pub_diff = pubsh3 - pubsh2;
+
+           color = 'GREEN'; 
+           if(pub_diff  < 0 ) color = 'RED';
+           extrainfo = '<span style="color:' + color + '"><b> PUBLIC DIFF </b>: ' + pub_diff + '</span>';
+
+
+         
+
+  
+            this.dynamicHTMLContent =  `
             <table> 
 
            <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr>
@@ -892,14 +995,14 @@ SBZEALBANGLA : '14266'  }
            <tr> <td> PaidUp </td><td> `+  obj.PaidUp +  `</td></tr>
            <tr> <td> Sector </td><td> `+  obj.Sector +  `</td></tr>
            <tr> <td> YearEnd </td><td> `+  obj.YearEnd +  `</td></tr>
-           <tr> <td> Reserve </td><td> `+  obj.Reserve +  `</td></tr></table>
+           <tr> <td> Reserve </td><td> `+  obj.Reserve +  `</td></tr></table>--`+extrainfo+` -- 
            <h4>OTHER INFORMATION </h4> 
             <table><tr><td>`+  obj.OtherInfo +  ` </td></tr></table>
            <h4>Address</h4>
            <table><tr><td>`+  obj.Address +  ` </td></tr></table>
  
 
-           </table> <br /> <a href='http://dsebd.org/displayCompany.php?name='` + script + `' target='_blank'>`+ script + `</a> 
+           </table> <br /> <a href='http://dsebd.org/displayCompany.php?name=`+ script + `' target='_blank'>`+ script + `</a> 
 
            `;
 
@@ -939,9 +1042,14 @@ ul.nav,
 ul.nav li{ list-style:none; margin: 2px 0; padding: 5px 10px; width: 90%;   cursor: pointer;  }
 ul.nav li{  color: #fff; border-bottom: 1px dotted #777;  text-align: left; }
 ul.nav li.active, ul.nav li:hover{ background: #000;}
-ul.nav li i{  color: #fff; cursor: pointer; margin-right: 10px; cursor: pointer; }
+ul.nav li i, #scriptAction i{  color: #fff; cursor: pointer; margin-right: 10px; cursor: pointer; }
 ul.nav li span{display: block; margin-top: 5px; } 
-
+#scriptAction{ padding: 10px;}
+ 
+#scriptAction{ padding: 10px;}
+#scriptAction select{ font-size: 18px; padding: 4px;}
+#scriptAction h5 { margin: 0 ; padding:10px 0; font-size: 20px; text-align: left; color: #fff;}
+ 
 h5 { margin: 0 ; padding:2px 0;}
 
 ::-webkit-scrollbar {
