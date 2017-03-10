@@ -971,6 +971,7 @@ console.log(obj.Script)
 
 
            var pubsh2 = $('td font', row2).eq(4).html();
+           console.log(pubsh2);
            pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
             
            var pubsh3 = $('td font', row3).eq(4).html();
