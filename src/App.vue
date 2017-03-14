@@ -940,6 +940,9 @@ console.log(obj.Script)
 
             this.iframeURL = this.dynamicHTMLContent =  '';
             var _this  = this;
+            var red_scripts = '';
+            var green_scripts  = '';
+
 
             _.forEach(this.unshortdsecompanies , function(v){  
                   var script = v.script;
@@ -974,25 +977,41 @@ console.log(obj.Script)
                                    var pub_diff = pubsh3 - pubsh2;
 
                                    color = 'GREEN'; 
-                                   if(pub_diff  < 0 ) color = 'RED';
-                                   extrainfo = '<span style="color:' + color + '"><b> PUBLIC DIFF </b>: ' + pub_diff + '</span>';
+                                       if(pub_diff  < 0 ) {  
+                                        color  = "RED";
+                                        extrainfo = '<span style="color:' + color + '"> ' + pub_diff + '</span>';
+ 
+                              
+                                        red_scripts +=  `
+                                        <table>  <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `-`+extrainfo+`</td></tr> </table>
 
+                                       `;
 
-                                 
+                                       }else{
 
-                          
-                                    _this.dynamicHTMLContent +=  `
-                                    <table> 
+                                        color = 'GREEN'; 
+                                          extrainfo = '<span style="color:' + color + '"> ' + pub_diff + '</span>';
+ 
+                              
+                                         green_scripts +=  `
+                                            <table>  <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `-`+extrainfo+`</td></tr> </table> 
 
-                                   <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr> </table>--`+extrainfo+` -- 
+                                           `;
 
-                                   `;
+                                       }
+
                                    }
 
                            }
 
 
             });
+
+
+    this.dynamicHTMLContent =  red_scripts  + green_scripts ;
+
+
+
      },
      OpenURL: function(url){ 
           this.iframeURL = url; 
