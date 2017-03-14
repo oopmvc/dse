@@ -1006,7 +1006,7 @@ SBZEALBANGLA : '14266'  }
                  var color = 'RED'; 
                  var  extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              red_scripts +=  `
-                                 <tr> <td style='width:120px;'> Script </td><td > `+  v.Script +  `</td><td>`+extrainfo+`</td></tr> 
+                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a></td><td>`+extrainfo+`</td></tr> 
                               `;
             });
 
@@ -1019,8 +1019,8 @@ SBZEALBANGLA : '14266'  }
             _.forEach(greensortedArray, function(v){ 
                  var color = 'GREEN'; 
                  var extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
-                             red_scripts +=  `
-                                <tr> <td style='width:120px;'> Script </td><td> `+  v.Script +  `</td><td>`+extrainfo+`</td></tr>   
+                             green_scripts += `
+                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a></td><td>`+extrainfo+`</td></tr> 
                               `;
             })
 
