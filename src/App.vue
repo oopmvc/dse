@@ -943,6 +943,9 @@ console.log(obj.Script)
             var red_scripts = '';
             var green_scripts  = '';
 
+            var redarray = [];
+            var greenarray = [];
+
 
             _.forEach(this.unshortdsecompanies , function(v){  
                   var script = v.script;
@@ -975,28 +978,12 @@ console.log(obj.Script)
                                    pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
 
                                    var pub_diff = pubsh3 - pubsh2;
-
-                                   color = 'GREEN'; 
-                                       if(pub_diff  < 0 ) {  
-                                        color  = "RED";
-                                        extrainfo = '<span style="color:' + color + '"> ' + pub_diff + '</span>';
  
-                              
-                                        red_scripts +=  `
-                                        <table>  <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `-`+extrainfo+`</td></tr> </table>
-
-                                       `;
-
+                                       if(pub_diff  < 0 ) {   
+                                            redarray.push({Script: script, pub_diff: pub_diff}); 
                                        }else{
 
-                                        color = 'GREEN'; 
-                                          extrainfo = '<span style="color:' + color + '"> ' + pub_diff + '</span>';
- 
-                              
-                                         green_scripts +=  `
-                                            <table>  <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `-`+extrainfo+`</td></tr> </table> 
-
-                                           `;
+                                            greenarray.push({Script: script, pub_diff: pub_diff}); 
 
                                        }
 
@@ -1007,9 +994,39 @@ console.log(obj.Script)
 
             });
 
+            
+            var sortedArray = _.sortBy(redarray, function (obj) { 
+             return obj.pub_diff;
+            });
 
-    this.dynamicHTMLContent =  red_scripts  + green_scripts ;
+            _.forEach(sortedArray, function(v){ 
+                 var color = 'RED'; 
+                 var  extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
+                             red_scripts +=  `
+                                 <tr> <td style='width:120px;'> Script </td><td> `+  v.Script +  `</td><td>`+extrainfo+`</td></tr> 
+                              `;
+            });
 
+           
+
+            var greensortedArray = _.sortBy(greenarray, function (obj) { 
+             return obj.pub_diff;
+            });
+
+            _.forEach(greensortedArray, function(v){ 
+                 var color = 'GREEN'; 
+                 var extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
+                             red_scripts +=  `
+                                <tr> <td style='width:120px;'> Script </td><td> `+  v.Script +  `</td><td>`+extrainfo+`</td></tr>   
+                              `;
+            })
+
+             
+                            
+
+
+        this.dynamicHTMLContent =  '<table>'+ red_scripts  + green_scripts + '</table>';
+ 
 
 
      },
