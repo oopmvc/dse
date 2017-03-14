@@ -85,6 +85,7 @@ export default {
         dsescrap: [],
         dynamicHTML: true,
         dynamicHTMLContent: '',
+        ComputedPublicShare: '',
         selectScript: '',
         links: [
                 {
@@ -876,19 +877,19 @@ SBZEALBANGLA : '14266'  }
     },
    mounted(){ 
         var _this = this;
-        console.log(this.dsescrap);
+        // console.log(this.dsescrap);
 
          axios.get('/dsescrap.json')
          .then(function (response) { 
              _this.dsescrap = response.data ;
 
 
-             _.forEach(_this.dsescrap, function(obj){
+           /*  _.forEach(_this.dsescrap, function(obj){
 
                         var patt = new RegExp("([T]\\d)");
                         var res = patt.test(obj.Script); // "T15Y0323"
 
-console.log(obj.Script)
+                        console.log(obj.Script)
                        
                        if(! RegExp("([T]\\d)").test(obj.Script) ){ 
                                 
@@ -909,10 +910,10 @@ console.log(obj.Script)
                                if(pub_diff  < 0 )  console.log(obj.Script)
                            }
 
-             })
+             })*/
 
-
-
+            _this.calculateAllPublicShareDecrease();
+ 
          })
          .catch(function (error) {
            console.log(error);
@@ -937,6 +938,8 @@ console.log(obj.Script)
   methods:{
 
      calculateAllPublicShareDecrease: function(){
+
+          if(this.ComputedPublicShare == ''){ 
 
             this.iframeURL = this.dynamicHTMLContent =  '';
             var _this  = this;
@@ -1003,7 +1006,7 @@ console.log(obj.Script)
                  var color = 'RED'; 
                  var  extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              red_scripts +=  `
-                                 <tr> <td style='width:120px;'> Script </td><td> `+  v.Script +  `</td><td>`+extrainfo+`</td></tr> 
+                                 <tr> <td style='width:120px;'> Script </td><td > `+  v.Script +  `</td><td>`+extrainfo+`</td></tr> 
                               `;
             });
 
@@ -1026,6 +1029,11 @@ console.log(obj.Script)
 
 
         this.dynamicHTMLContent =  '<table>'+ red_scripts  + green_scripts + '</table>';
+        this.ComputedPublicShare  = this.dynamicHTMLContent;
+
+    }else{
+            this.dynamicHTMLContent =        this.ComputedPublicShare;
+    }
  
 
 
