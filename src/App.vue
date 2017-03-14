@@ -10,7 +10,9 @@
                       <ul class="nav">
                         <li v-for="link in links" @click="OpenURL(link.url)"> {{ link.text }}   </li>
                       </ul>
-
+                     <ul class="nav">
+                         <li  @click="calculateAllPublicShareDecrease()" > Pub % <   </li>
+                     </ul>
                    
                    <div id="scriptAction">
 
@@ -933,6 +935,65 @@ console.log(obj.Script)
      }
   },
   methods:{
+
+     calculateAllPublicShareDecrease: function(){
+
+            this.iframeURL = this.dynamicHTMLContent =  '';
+            var _this  = this;
+
+            _.forEach(this.unshortdsecompanies , function(v){  
+                  var script = v.script;
+
+
+                  var obj = _.find(_this.dsescrap, function(el) {
+                      return _.get(el, 'Script') === script;
+                   });
+
+                   
+                     
+                 
+
+                   var extrainfo = '';  
+                   var color = 'GREEN';
+                    
+                   //if( typeof  obj.OtherInfo === "undefined") alert('Undefined')
+                   if(_.has(obj, 'OtherInfo')){ 
+                           var table  = jQuery(obj.OtherInfo); 
+                           var row2 = jQuery('table tr', table).eq(1);
+                           var row3 = jQuery('table tr', table).eq(2) ;
+                 
+                            
+
+                           var pubsh2 = $('td font', row2).eq(4).html(); 
+                           if(typeof pubsh2 !== 'undefined'){  
+                                   pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
+                                    
+                                   var pubsh3 = $('td font', row3).eq(4).html();
+                                   pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
+
+                                   var pub_diff = pubsh3 - pubsh2;
+
+                                   color = 'GREEN'; 
+                                   if(pub_diff  < 0 ) color = 'RED';
+                                   extrainfo = '<span style="color:' + color + '"><b> PUBLIC DIFF </b>: ' + pub_diff + '</span>';
+
+
+                                 
+
+                          
+                                    _this.dynamicHTMLContent +=  `
+                                    <table> 
+
+                                   <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr> </table>--`+extrainfo+` -- 
+
+                                   `;
+                                   }
+
+                           }
+
+
+            });
+     },
      OpenURL: function(url){ 
           this.iframeURL = url; 
 
@@ -951,61 +1012,66 @@ console.log(obj.Script)
 
            var extrainfo = '';  
            var color = 'GREEN';
+
+            if(_.has(obj, 'OtherInfo')){ 
              
-           var table  = jQuery(obj.OtherInfo);
-//           var row1 = jQuery('table tr', table).eq(0) ;
-           var row2 = jQuery('table tr', table).eq(1);
-           var row3 = jQuery('table tr', table).eq(2) ;
- 
-           var spdir2 = $('td font', row2).eq(0).html();
-           spdir2 = parseFloat(spdir2.replace("Sponsor/Director:<br>", ""));
-            
-           var spdir3 = $('td font', row3).eq(0).html();
-           spdir3 = parseFloat(spdir3.replace("Sponsor/Director:<br>", ""));
+                           var table  = jQuery(obj.OtherInfo);
+                //           var row1 = jQuery('table tr', table).eq(0) ;
+                           var row2 = jQuery('table tr', table).eq(1);
+                           var row3 = jQuery('table tr', table).eq(2) ;
+                 
+                          /* var spdir2 = $('td font', row2).eq(0).html();
+                           spdir2 = parseFloat(spdir2.replace("Sponsor/Director:<br>", ""));
+                            
+                           var spdir3 = $('td font', row3).eq(0).html();
+                           spdir3 = parseFloat(spdir3.replace("Sponsor/Director:<br>", ""));
 
-           var spdir_diff = spdir3 - spdir2;
+                           var spdir_diff = spdir3 - spdir2;
 
-           color = 'GREEN'; 
-           if(spdir_diff  < 0 ) color = 'RED';
-           extrainfo = '<span style="color:' + color + '"><b> SPDIR DIFF </b>: ' + spdir_diff + '</span><br /> ';
-
-
-           var pubsh2 = $('td font', row2).eq(4).html();
-           console.log(pubsh2);
-           pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
-            
-           var pubsh3 = $('td font', row3).eq(4).html();
-           pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
-
-           var pub_diff = pubsh3 - pubsh2;
-
-           color = 'GREEN'; 
-           if(pub_diff  < 0 ) color = 'RED';
-           extrainfo = '<span style="color:' + color + '"><b> PUBLIC DIFF </b>: ' + pub_diff + '</span>';
+                           color = 'GREEN'; 
+                           if(spdir_diff  < 0 ) color = 'RED';
+                           extrainfo = '<span style="color:' + color + '"><b> SPDIR DIFF </b>: ' + spdir_diff + '</span><br /> '; */
 
 
-         
+                           var pubsh2 = $('td font', row2).eq(4).html();
+                           console.log(pubsh2);
+                      if(typeof pubsh2 !== 'undefined'){  
+                                       pubsh2 = parseFloat(pubsh2.replace("Public:<br>", ""));
+                                        
+                                       var pubsh3 = $('td font', row3).eq(4).html();
+                                       pubsh3 = parseFloat(pubsh3.replace("Public:<br>", ""));
 
-  
-            this.dynamicHTMLContent =  `
-            <table> 
+                                       var pub_diff = pubsh3 - pubsh2;
 
-           <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr>
-           <tr> <td> Total Security </td><td> `+  obj.TotalSecurity +  `</td></tr>
-           <tr> <td> AuthorizedCap </td><td> `+  obj.AuthorizedCap +  `</td></tr>
-           <tr> <td> PaidUp </td><td> `+  obj.PaidUp +  `</td></tr>
-           <tr> <td> Sector </td><td> `+  obj.Sector +  `</td></tr>
-           <tr> <td> YearEnd </td><td> `+  obj.YearEnd +  `</td></tr>
-           <tr> <td> Reserve </td><td> `+  obj.Reserve +  `</td></tr></table>--`+extrainfo+` -- 
-           <h4>OTHER INFORMATION </h4> 
-            <table><tr><td>`+  obj.OtherInfo +  ` </td></tr></table>
-           <h4>Address</h4>
-           <table><tr><td>`+  obj.Address +  ` </td></tr></table>
- 
+                                       color = 'GREEN'; 
+                                       if(pub_diff  < 0 ) color = 'RED';
+                                       extrainfo = '<span style="color:' + color + '"><b> PUBLIC DIFF </b>: ' + pub_diff + '</span>';
 
-           </table> <br /> <a href='http://dsebd.org/displayCompany.php?name=`+ script + `' target='_blank'>`+ script + `</a> 
 
-           `;
+                                     
+
+                              
+                                        this.dynamicHTMLContent =  `
+                                        <table> 
+
+                                       <tr> <td style='width:120px;'> Script </td><td> `+  obj.Script +  `</td></tr>
+                                       <tr> <td> Total Security </td><td> `+  obj.TotalSecurity +  `</td></tr>
+                                       <tr> <td> AuthorizedCap </td><td> `+  obj.AuthorizedCap +  `</td></tr>
+                                       <tr> <td> PaidUp </td><td> `+  obj.PaidUp +  `</td></tr>
+                                       <tr> <td> Sector </td><td> `+  obj.Sector +  `</td></tr>
+                                       <tr> <td> YearEnd </td><td> `+  obj.YearEnd +  `</td></tr>
+                                       <tr> <td> Reserve </td><td> `+  obj.Reserve +  `</td></tr></table>--`+extrainfo+` -- 
+                                       <h4>OTHER INFORMATION </h4> 
+                                        <table><tr><td>`+  obj.OtherInfo +  ` </td></tr></table>
+                                       <h4>Address</h4>
+                                       <table><tr><td>`+  obj.Address +  ` </td></tr></table>
+                             
+
+                                       </table> <br /> <a href='http://dsebd.org/displayCompany.php?name=`+ script + `' target='_blank'>`+ script + `</a> 
+
+                                       `;
+                            }
+            }
 
 
      },
