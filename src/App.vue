@@ -1006,7 +1006,7 @@ SBZEALBANGLA : '14266'  }
                  var color = 'RED'; 
                  var  extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              red_scripts +=  `
-                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a></td><td>`+extrainfo+`</td></tr> 
+                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a></td></tr> 
                               `;
             });
 
@@ -1020,7 +1020,7 @@ SBZEALBANGLA : '14266'  }
                  var color = 'GREEN'; 
                  var extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              green_scripts += `
-                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a></td><td>`+extrainfo+`</td></tr> 
+                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-signal fa-2x"></i> </a></td></tr> 
                               `;
             })
 
