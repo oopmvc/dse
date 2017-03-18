@@ -11,8 +11,8 @@
                         <li v-for="link in links" @click="OpenURL(link.url)"> {{ link.text }}   </li>
                       </ul>
                      <ul class="nav">
-                         <li  @click="calculateAllPublicShareDecrease()" > Pub % <   </li>
-                         <li  @click="showYarEnd()" > YearEnd <   </li>
+                         <li  @click="calculateAllPublicShareDecrease()" > Pub Diff (%)   </li>
+                         <li  @click="showYarEnd()" > YearEnd Sort   </li>
                      </ul>
                    
                    <div id="scriptAction">
@@ -973,11 +973,11 @@ SBZEALBANGLA : '14266'  }
              _.forEach(sortedArray, function(v){  
                  var  extrainfo = '<span style="color:#666"> ' + v.YearEnd + '</span>'; 
                              yearEndLocalHTML +=  `
-                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a></td></tr> 
+                                 <tr> <td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=60&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a></td></tr> 
                               `;
             }); 
 
-            this.showYarEndHTML = this.dynamicHTMLContent  = '<table>' +  yearEndLocalHTML +  '</table>';
+            this.showYarEndHTML = this.dynamicHTMLContent  = '<table style="width: 80%;"><tr> <td style="width:120px; padding: 10px;">  Script </td> <td> Year End </td><td> DSE Graph </td></tr>' +  yearEndLocalHTML +  '</table>';
 
         }else{
           this.dynamicHTMLContent = this.showYarEndHTML;
@@ -1029,7 +1029,7 @@ SBZEALBANGLA : '14266'  }
                                    var pub_diff = pubsh3 - pubsh2;
  
                                        if(pub_diff  < 0 ) {   
-                                            redarray.push({Script: script, pub_diff: pub_diff}); 
+                                            redarray.push({Script: script, pub_diff: pub_diff, YearEnd: obj.YearEnd}); 
                                        }else{
 
                                             greenarray.push({Script: script, pub_diff: pub_diff}); 
@@ -1052,7 +1052,7 @@ SBZEALBANGLA : '14266'  }
                  var color = 'RED'; 
                  var  extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              red_scripts +=  `
-                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a></td></tr> 
+                                 <tr>  <td rowspan="2"> <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td>`+v.YearEnd+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=60&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a>  - <a href="#" onClick="jQuery('.allgraph').hide();jQuery('#my`+v.Script+`').toggle();jQuery('#my`+v.Script+` img').attr('src', 'http://www.amarstock.com/Chart/draw?Code=`+v.Script+`&OVER=OverlayV!&Size=800*500&RT=0&Cycle=Week1&Width=1&type=3&bg=white&upColor=green&downColor=red&grid=1&sv=1&cg=1');" <i class="fa fa-area-chart  fa-2x"></i></a> </td></tr> <tr><td colspan="3" style="text-align:center;"> <div style="display:none; width: 100%;" id="my`+v.Script+`" class="allgraph"><a style="text-align:right; vertical-align:top;float: right;" href="#" onClick="jQuery('.allgraph').hide(); " <i class="fa fa-close fa-2x"></i></a> <img src="" alt=""    /> </div></td></tr>
                               `;
             });
 
@@ -1066,7 +1066,7 @@ SBZEALBANGLA : '14266'  }
                  var color = 'GREEN'; 
                  var extrainfo = '<span style="color:' + color + '"> ' + v.pub_diff + '</span>'; 
                              green_scripts += `
-                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-signal fa-2x"></i> </a></td></tr> 
+                                 <tr><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-signal fa-2x"></i> </a></td></tr> 
                               `;
             })
 
@@ -1074,7 +1074,7 @@ SBZEALBANGLA : '14266'  }
                             
 
 
-        this.dynamicHTMLContent =  '<table>'+ red_scripts  + green_scripts + '</table>';
+        this.dynamicHTMLContent =  '<table style="width: 80%;"><tr> <td style="width:120px; padding: 10px;"> Script </td> <td> Public Holding Diff(%) from previous Month</td><td> Year End </td><td> DSE Graph </td> </tr>'+ red_scripts  + green_scripts + '</table>';
         this.ComputedPublicShare  = this.dynamicHTMLContent;
 
     }else{
