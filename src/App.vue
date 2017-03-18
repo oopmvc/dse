@@ -12,6 +12,7 @@
                       </ul>
                      <ul class="nav">
                          <li  @click="calculateAllPublicShareDecrease()" > Pub % <   </li>
+                         <li  @click="showYarEnd()" > YearEnd <   </li>
                      </ul>
                    
                    <div id="scriptAction">
@@ -85,6 +86,7 @@ export default {
         dsescrap: [],
         dynamicHTML: true,
         dynamicHTMLContent: '',
+        showYarEndHTML: '',
         ComputedPublicShare: '',
         selectScript: '',
         links: [
@@ -937,6 +939,50 @@ SBZEALBANGLA : '14266'  }
   },
   methods:{
 
+     showYarEnd: function(){
+       if(this.showYarEndHTML == ''){ 
+            this.iframeURL = this.dynamicHTMLContent =  '';
+
+
+             var _this  = this; 
+             var yearEndLocalHTML = '';
+
+             var yearEndArray = [];
+
+
+            _.forEach(this.dsecompanies , function(v){  
+                  var script = v.script;
+
+
+                  var obj = _.find(_this.dsescrap, function(el) {
+                      return _.get(el, 'Script') === script;
+                   });
+
+                    if(_.has(obj, 'Script')){ 
+                        yearEndArray.push({Script: script, YearEnd: obj.YearEnd});  
+                 }
+
+             });
+
+
+            var sortedArray = _.sortBy(yearEndArray, function (obj) { 
+                     return obj.YearEnd;
+            });
+
+
+             _.forEach(sortedArray, function(v){  
+                 var  extrainfo = '<span style="color:#666"> ' + v.YearEnd + '</span>'; 
+                             yearEndLocalHTML +=  `
+                                 <tr> <td style='width:120px;'> Script </td><td > <a href="http://dsebd.org/displayCompany.php?name=`+  v.Script +  `" target="_blank"> `+  v.Script +  `</a> </td><td>`+extrainfo+`</td><td><a href="http://www.dsebd.org/php_graph/monthly_graph.php?inst=`+  v.Script +  `&duration=24&type=price" target="_blank"> <i class="fa fa-line-chart  fa-2x"></i></a></td></tr> 
+                              `;
+            }); 
+
+            this.showYarEndHTML = this.dynamicHTMLContent  = '<table>' +  yearEndLocalHTML +  '</table>';
+
+        }else{
+          this.dynamicHTMLContent = this.showYarEndHTML;
+        }
+     }, 
      calculateAllPublicShareDecrease: function(){
 
           if(this.ComputedPublicShare == ''){ 
